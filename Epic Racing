@@ -1,0 +1,74 @@
+# import necessary libraries
+import pygame
+import random
+
+# define constants for the game
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+# initialize pygame
+pygame.init()
+
+# set up the screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Racing Game")
+
+# load and set up the player car image
+player_car_image = pygame.image.load("player_car.png")
+player_car_rect = player_car_image.get_rect()
+
+# initialize player car position
+player_car_rect.x = SCREEN_WIDTH / 2
+player_car_rect.y = SCREEN_HEIGHT - player_car_rect.height
+
+# load and set up the enemy car image
+enemy_car_image = pygame.image.load("enemy_car.png")
+enemy_car_rect = enemy_car_image.get_rect()
+
+# initialize enemy car position
+enemy_car_rect.x = random.randint(0, SCREEN_WIDTH - enemy_car_rect.width)
+enemy_car_rect.y = - enemy_car_rect.height
+
+# set up game clock
+clock = pygame.time.Clock()
+
+# game loop
+while True:
+    # handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # update positions
+    enemy_car_rect.y += 5
+    if enemy_car_rect.y > SCREEN_HEIGHT:
+        enemy_car_rect.y = - enemy_car_rect.height
+        enemy_car_rect.x = random.randint(0, SCREEN_WIDTH - enemy_car_rect.width)
+
+    # handle player movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player_car_rect.x -= 5
+    if keys[pygame.K_RIGHT]:
+        player_car_rect.x += 5
+
+    # keep player car on screen
+    if player_car_rect.x < 0:
+        player_car_rect.x = 0
+    elif player_car_rect.x > SCREEN_WIDTH - player_car_rect.width:
+        player_car_rect.x = SCREEN_WIDTH - player_car_rect.width
+
+    # check for collision
+    if player_car_rect.colliderect(enemy_car_rect):
+        print("Collision!")
+        sys.exit()
+
+    # draw the screen
+    screen.fill((0, 0, 0))
+    screen.blit(player_car_image, player_car_rect)
+    screen.blit(enemy_car_image, enemy_car_rect)
+    pygame.display.flip()
+
+    # limit frame rate
+    clock.tick(60)
